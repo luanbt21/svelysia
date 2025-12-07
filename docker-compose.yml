@@ -1,0 +1,15 @@
+services:
+  openobserve:
+    container_name: openobserve
+    image: public.ecr.aws/zinclabs/openobserve:latest
+    restart: unless-stopped
+    environment:
+      ZO_ROOT_USER_EMAIL: "luanbt21@gmail.com"
+      ZO_ROOT_USER_PASSWORD: "123456"
+    ports:
+      - "5080:5080"
+    volumes:
+      - openobserve_data:/dataopentelemetry
+
+volumes:
+  openobserve_data:

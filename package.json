@@ -1,0 +1,49 @@
+{
+  "name": "svelysia",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "serve": "bun run --watch src/api/index.ts",
+    "dev": "bun --bun vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "prepare": "svelte-kit sync || echo ''",
+    "fmt": "bunx oxfmt",
+    "lint": "bunx oxlint --type-aware",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "test:unit": "vitest",
+    "test": "npm run test:unit -- --run"
+  },
+  "devDependencies": {
+    "@iconify-json/simple-icons": "^1.2.61",
+    "@iconify-json/tabler": "^1.2.23",
+    "@sveltejs/kit": "^2.49.1",
+    "@sveltejs/vite-plugin-svelte": "^6.2.1",
+    "@unocss/extractor-svelte": "^66.5.10",
+    "@unocss/preset-icons": "^66.5.10",
+    "@unocss/preset-wind4": "^66.5.10",
+    "@vitest/browser-playwright": "^4.0.15",
+    "bun-types": "latest",
+    "oxfmt": "^0.16.0",
+    "oxlint": "^1.31.0",
+    "oxlint-tsgolint": "^0.8.3",
+    "playwright": "^1.57.0",
+    "svelte": "^5.45.6",
+    "svelte-adapter-bun": "^1.0.1",
+    "svelte-check": "^4.3.4",
+    "typescript": "^5.9.3",
+    "unocss": "^66.5.10",
+    "vite": "^7.2.6",
+    "vite-plugin-devtools-json": "^1.0.0",
+    "vitest": "^4.0.15",
+    "vitest-browser-svelte": "^2.0.1"
+  },
+  "dependencies": {
+    "@elysiajs/opentelemetry": "^1.4.8",
+    "@opentelemetry/exporter-trace-otlp-proto": "^0.208.0",
+    "@opentelemetry/sdk-trace-node": "^2.2.0",
+    "elysia": "^1.4.18"
+  }
+}
