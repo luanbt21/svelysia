@@ -1,80 +1,46 @@
-import { type MaybePromise, Elysia } from "elysia";
-import { opentelemetry } from "@elysiajs/opentelemetry";
+import { getCurrentSpan, opentelemetry } from "@elysiajs/opentelemetry";
 import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-node";
-import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-proto";
+import { Elysia } from "elysia";
 
+import { logger, traceExporter } from "./prelude";
 import { routes } from "./routes";
+import { getSvelteHandler } from "./setup";
+import { wrap } from "@bogeychan/elysia-logger";
 
-type SvelteHandler = {
-  fetch: (request: Request) => MaybePromise<Response>;
-  websocket: any;
-};
-
-/**
- * Lazily loads the SvelteKit build handler.
- * Returns `undefined` if the build artifact does not exist.
- */
-async function getSvelteHandler(): Promise<SvelteHandler | undefined> {
-  const buildPath = `${import.meta.dir}/../../build/handler.js`;
-
-  const buildFile = Bun.file(buildPath);
-
-  if (!(await buildFile.exists())) {
-    return undefined;
-  }
-
-  try {
-    const module = await import(buildPath);
-    return module.getHandler();
-  } catch (error) {
-    console.error(`Error loading SvelteKit handler from ${buildPath}:`, error);
-    return undefined;
-  }
-}
-
-const traceExporter = new OTLPTraceExporter({
-  url: Bun.env.OPEN_OBSERVE_URL,
-  headers: {
-    Authorization: `Basic ${Bun.env.OPEN_OBSERVE_TOKEN}`,
-  },
-});
-
+logger.info("Starting application");
 const app = new Elysia()
   .use(
     opentelemetry({
       spanProcessors: [new BatchSpanProcessor(traceExporter)],
     }),
   )
-  .derive(async function getProfile({ cookie: { session } }) {
-    console.log("Fetching profile");
-    return {
-      user: { name: "John Doe" },
-    };
-  })
-  .get("api/hola", async function hello() {
-    await fetch("http://localhost:3000", {
-      method: "POST",
-      headers: {
-        Authorization: `Basic ${Bun.env.OPEN_OBSERVE_TOKEN}`,
-      },
-      body: JSON.stringify({ message: "Hello World!" }),
-    });
-    return "Hola World!";
+  .use(wrap(logger, { autoLogging: true }))
+
+  .get("api/hola", async function hello(ctx) {
+    ctx.log.info(ctx.request, "Request");
+
+    const span = getCurrentSpan();
+    if (span) {
+      const { traceId, spanId } = span.spanContext();
+      ctx.log.info({ trace_id: traceId, span_id: spanId }, "Hello World!");
+      return { traceId, spanId };
+    }
+    return {};
   })
   .use(routes);
 
 const svelteHandler = await getSvelteHandler();
 
 if (svelteHandler) {
-  console.log("✅ SvelteKit handler mounted.");
+  logger.info("✅ SvelteKit handler mounted.");
   app.mount("/", svelteHandler.fetch);
 } else {
-  console.log("⚠️ SvelteKit build not found. Running in API-only mode.");
+  logger.warn("⚠️ SvelteKit build not found. Running in API-only mode.");
   app.get("/", () => "Elysia is running (SvelteKit not found)");
 }
 
 app.listen(3000);
 
-console.log(
+logger.info(
   `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`,
 );
