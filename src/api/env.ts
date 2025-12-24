@@ -10,7 +10,7 @@ const CommonVars = Type.Object({
 });
 
 const TracingEnabled = Type.Object({
-  ENABLE_TRACING: Type.Literal(true),
+  ENABLE_TRACING: Type.Boolean(),
   OPEN_OBSERVE_ORGANIZATION: Type.String({ minLength: 1 }),
   OPEN_OBSERVE_STREAM_NAME: Type.String({ minLength: 1 }),
   OPEN_OBSERVE_URL: Type.String({ pattern: URI_PATTERN }),
@@ -18,19 +18,16 @@ const TracingEnabled = Type.Object({
   OPEN_OBSERVE_PASSWORD: Type.String({ minLength: 1 }),
 });
 
-const TracingDisabled = Type.Object({
-  ENABLE_TRACING: Type.Literal(false, { default: false }),
-  OPEN_OBSERVE_ORGANIZATION: Type.Optional(Type.String()),
-  OPEN_OBSERVE_STREAM_NAME: Type.Optional(Type.String()),
-  OPEN_OBSERVE_URL: Type.Optional(Type.String()),
-  OPEN_OBSERVE_EMAIL: Type.Optional(Type.String()),
-  OPEN_OBSERVE_PASSWORD: Type.Optional(Type.String()),
-});
+// const TracingDisabled = Type.Object({
+//   ENABLE_TRACING: Type.Literal(false, { default: false }),
+//   OPEN_OBSERVE_ORGANIZATION: Type.Optional(Type.String()),
+//   OPEN_OBSERVE_STREAM_NAME: Type.Optional(Type.String()),
+//   OPEN_OBSERVE_URL: Type.Optional(Type.String()),
+//   OPEN_OBSERVE_EMAIL: Type.Optional(Type.String()),
+//   OPEN_OBSERVE_PASSWORD: Type.Optional(Type.String()),
+// });
 
-const EnvSchema = Type.Intersect([
-  CommonVars,
-  Type.Union([TracingEnabled, TracingDisabled]),
-]);
+const EnvSchema = Type.Intersect([CommonVars, TracingEnabled]);
 
 export type Env = Static<typeof EnvSchema>;
 
@@ -47,9 +44,7 @@ function validateEnv(): Env {
         // Customized error messages for patterns
         if (e.path.includes("DATABASE_URL") && e.type === 52) {
           // 52 is Pattern mismatch
-          console.error(
-            `- ${e.path}: Must be a valid connection URI (e.g. postgres://...)`,
-          );
+          console.error(`- ${e.path}: Must be a valid connection URI (e.g. postgres://...)`);
         } else if (e.path.includes("EMAIL") && e.type === 52) {
           console.error(`- ${e.path}: Must be a valid email address`);
         } else {
