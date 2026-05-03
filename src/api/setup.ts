@@ -10,7 +10,8 @@ type SvelteHandler = {
  * Returns `undefined` if the build artifact does not exist.
  */
 export async function getSvelteHandler(): Promise<SvelteHandler | undefined> {
-  const buildPath = `${import.meta.dir}/../../build/handler.js`;
+  // const buildPath = `${import.meta.dir}/../../build/handler.js`;
+  const buildPath = `${process.cwd()}/build/handler.js`;
 
   const buildFile = Bun.file(buildPath);
 

@@ -13,7 +13,18 @@ if (!env.ENABLE_TRACING) {
 }
 logger.info("Starting application");
 
-export const app = new Elysia()
+const app = new Elysia();
+
+const svelteHandler = await getSvelteHandler();
+if (svelteHandler) {
+  logger.info("🚀 SvelteKit handler mounted.");
+  app.mount("/", svelteHandler.fetch);
+} else {
+  logger.warn("⚠️ SvelteKit build not found. Running in API-only mode.");
+  app.get("/", () => "Elysia is running (SvelteKit not found)");
+}
+
+app
   .use(
     openapi({
       documentation: {
@@ -52,16 +63,18 @@ export const app = new Elysia()
   )
   .use(routes);
 
-const svelteHandler = await getSvelteHandler();
-
-if (svelteHandler) {
-  logger.info("✅ SvelteKit handler mounted.");
-  app.mount("/", svelteHandler.fetch);
-} else {
-  logger.warn("⚠️ SvelteKit build not found. Running in API-only mode.");
-  app.get("/", () => "Elysia is running (SvelteKit not found)");
-}
-
 app.listen(3000);
 
-logger.info(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`);
+const handleShutdown = async () => {
+  console.log("\nShutting down gracefully...");
+  await app.stop(true);
+
+  console.log("Server stopped. Exiting process.");
+  process.exit(0);
+};
+
+// Listen for termination signals
+process.on("SIGINT", handleShutdown);
+process.on("SIGTERM", handleShutdown);
+
+logger.info(`🦊 Elysia is running at ${app.server?.url}`);

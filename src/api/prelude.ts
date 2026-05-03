@@ -1,4 +1,5 @@
-import { transport } from "pino";
+import { multistream } from "pino";
+import pretty from "pino-pretty";
 import { OpenobserveTransport } from "@openobserve/pino-openobserve";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-proto";
 import { getCurrentSpan } from "@elysiajs/opentelemetry";
@@ -10,6 +11,7 @@ const openObserveToken = Buffer.from(
   `${env.OPEN_OBSERVE_EMAIL}:${env.OPEN_OBSERVE_PASSWORD}`,
 ).toString("base64");
 
+// TODO: set batchsize, timeThreshold to default values
 const options: ConstructorParameters<typeof OpenobserveTransport>[0] = {
   url: env.OPEN_OBSERVE_URL,
   organization: env.OPEN_OBSERVE_ORGANIZATION,
@@ -23,27 +25,19 @@ const options: ConstructorParameters<typeof OpenobserveTransport>[0] = {
   },
 };
 
-type TargetOptions = {
-  target: string;
-  options?: Record<string, unknown>;
-  level: string;
-};
-
-const targets: TargetOptions[] = [
+const streams: Parameters<typeof multistream>[0] = [
   {
-    target: "pino-pretty",
-    options: {
+    stream: pretty({
       colorize: true,
       destination: 1, // 1 = stdout
       ignore: "pid,hostname", // cleaner output
-    },
+    }),
     level: "info",
   },
   ...(env.ENABLE_TRACING
     ? [
         {
-          target: "@openobserve/pino-openobserve",
-          options: { ...options },
+          stream: new OpenobserveTransport({ ...options }),
           level: "info",
         },
       ]
@@ -52,7 +46,7 @@ const targets: TargetOptions[] = [
 
 export const logger = createPinoLogger({
   level: "info",
-  stream: transport({ targets }),
+  stream: multistream(streams),
   mixin() {
     const activeSpan = getCurrentSpan();
     if (!activeSpan) return {};
