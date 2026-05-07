@@ -1,38 +1,91 @@
-# sv
+# Svelysia
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A modern, high-performance full-stack web application template combining **SvelteKit** and **ElysiaJS**, powered by **Bun**.
 
-## Creating a project
+## Tech Stack
 
-If you're seeing this, you've probably already done this step. Congrats!
+- **Runtime & Package Manager**: [Bun](https://bun.sh/)
+- **Frontend**: [SvelteKit](https://kit.svelte.dev/)
+- **Backend**: [ElysiaJS](https://elysiajs.com/)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **Deployment**: Docker (Multi-stage build)
 
-```sh
-# create a new project in the current directory
-npx sv create
+## Getting Started
 
-# create a new project in my-app
-npx sv create my-app
-```
+### Prerequisites
 
-## Developing
+- Install [Bun](https://bun.sh/)
+- Install [Just](https://github.com/casey/just) (optional, but recommended for running commands)
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+### Installation
 
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
+Clone the repository and install dependencies:
 
 ```sh
-npm run build
+bun install
 ```
 
-You can preview the production build with `npm run preview`.
+### Development
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+This project consists of a SvelteKit frontend and an ElysiaJS backend. 
+
+To start the development environments, run the following commands in separate terminal windows:
+
+**Frontend (Vite dev server):**
+```sh
+just dev
+# or: bun --bun vite dev
+```
+
+**Backend (Elysia watcher):**
+```sh
+just serve
+# or: bun run --watch src/server.ts
+```
+
+## Available Commands
+
+We use a `justfile` to manage project commands efficiently. Run `just` to see all available recipes:
+
+```sh
+just build          # Build both frontend and backend
+just build-backend  # Build the backend executable using Bun
+just build-frontend # Build the frontend using Vite
+just check          # Run Svelte type checking
+just check-watch    # Run Svelte type checking in watch mode
+just dev            # Start the frontend dev server
+just docker-build   # Build the Docker image
+just docker-run     # Run the Docker container
+just fmt            # Format the codebase using oxfmt
+just lint           # Lint the codebase using oxlint
+just serve          # Start the backend server in watch mode
+just test           # Run unit tests
+just test-watch     # Run unit tests in watch mode
+```
+
+## Production & Deployment
+
+This project includes a multi-stage `Dockerfile` optimized for production. It builds the SvelteKit frontend and runs the backend natively using the lightweight `oven/bun:1-slim` image.
+
+To build the Docker image locally:
+```sh
+just docker-build
+# or: docker build -t svelysia .
+```
+
+To run the Docker container:
+```sh
+just docker-run
+# or: docker run -p 3000:3000 --env-file .env.local svelysia
+```
+
+## Environment Variables
+
+Make sure to configure your environment variables before running in production. You can use a `.env.local` file for local development and testing.
+
+```env
+PORT=3000
+DATABASE_URL=...
+ENABLE_TRACING=false
+# Other OpenObserve or external variables...
+```
