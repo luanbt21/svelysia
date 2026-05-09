@@ -1,6 +1,19 @@
 services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: svelysia
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   openobserve:
-    container_name: openobserve
+    # container_name: openobserve
     image: public.ecr.aws/zinclabs/openobserve:latest
     restart: unless-stopped
     environment:
@@ -13,3 +26,4 @@ services:
 
 volumes:
   openobserve_data:
+  postgres_data:

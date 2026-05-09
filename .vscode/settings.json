@@ -1,8 +1,6 @@
 {
-  "cSpell.words": [
-    "Elysia",
-    "elysiajs",
-    "multistream",
-    "Openobserve"
-  ]
+  "cSpell.words": ["Elysia", "elysiajs", "multistream", "Openobserve", "Svelysia"],
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  }
 }

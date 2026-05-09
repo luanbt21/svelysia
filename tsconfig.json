@@ -7,9 +7,7 @@
     "resolveJsonModule": true,
     "sourceMap": true,
     "verbatimModuleSyntax": true,
-    "lib": [
-      "ESNext"
-    ],
+    "lib": ["ESNext"],
     "module": "esnext",
     "target": "esnext",
     "moduleResolution": "bundler",
@@ -21,6 +19,6 @@
     "jsx": "preserve",
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    "allowJs": true,
-  },
+    "allowJs": true
+  }
 }
