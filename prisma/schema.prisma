@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client"
+  output   = "./generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// -----------------------------------------------------------------------------
+// USER & AUTHENTICATION
+// -----------------------------------------------------------------------------
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Trees owned or shared with this user
+  trees TreeMember[]
+}
+
+// -----------------------------------------------------------------------------
+// TREE MANAGEMENT & RBAC
+// -----------------------------------------------------------------------------
+
+model Tree {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members     TreeMember[]
+  nodes       Node[]
+  fields      CustomField[]
+  customTerms CustomKinshipTerm[]
+}
+
+// Maps Users to Trees with specific roles (Owner, Editor, Viewer)
+model TreeMember {
+  id        String   @id @default(uuid())
+  treeId    String
+  userId    String
+  role      String // e.g., "OWNER", "EDITOR", "VIEWER"
+  createdAt DateTime @default(now())
+
+  tree Tree @relation(fields: [treeId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([treeId, userId])
+}
+
+// -----------------------------------------------------------------------------
+// DYNAMIC PROFILES (NODES)
+// -----------------------------------------------------------------------------
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+// Represents a person in the family tree
+model Node {
+  id     String @id @default(uuid())
+  treeId String
+
+  // Standard Fields
+  firstName      String
+  lastName       String?
+  gender         Gender
+  idCardNumber   String? // CCCD/CMND
+  birthDate      DateTime
+  deathDate      DateTime?
+  lunarBirthDate String? // String representation of lunar date or specific format
+  lunarDeathDate String? // String representation of lunar date
+  phone          String?
+  email          String?
+  major          String?
+  jobPosition    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tree Tree @relation(fields: [treeId], references: [id], onDelete: Cascade)
+
+  // Custom field values
+  customValues CustomFieldValue[]
+
+  // Relationships
+  relationsAsSource Edge[] @relation("SourceNode")
+  relationsAsTarget Edge[] @relation("TargetNode")
+}
+
+// -----------------------------------------------------------------------------
+// DYNAMIC SCHEMA (CUSTOM FIELDS)
+// -----------------------------------------------------------------------------
+
+// Defines a new custom field available for all nodes in a specific Tree
+model CustomField {
+  id     String @id @default(uuid())
+  treeId String
+  name   String // e.g., "Military Service Number"
+  type   String // e.g., "STRING", "NUMBER", "DATE", "BOOLEAN"
+
+  tree   Tree               @relation(fields: [treeId], references: [id], onDelete: Cascade)
+  values CustomFieldValue[]
+
+  @@unique([treeId, name])
+}
+
+// Stores the actual value of a custom field for a specific Node
+model CustomFieldValue {
+  id      String @id @default(uuid())
+  nodeId  String
+  fieldId String
+  value   String // Stored as string, parsed based on CustomField.type
+
+  node  Node        @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+  field CustomField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  @@unique([nodeId, fieldId])
+}
+
+// -----------------------------------------------------------------------------
+// CUSTOM KINSHIP TERMS (i18n Overrides)
+// -----------------------------------------------------------------------------
+
+// Allows a tree owner to override the default i18n term for a specific kinship path
+model CustomKinshipTerm {
+  id      String @id @default(uuid())
+  treeId  String
+  pathKey String // e.g., "FATHER.OLDER_BROTHER"
+  term    String // e.g., "Bác trai"
+
+  tree Tree @relation(fields: [treeId], references: [id], onDelete: Cascade)
+
+  @@unique([treeId, pathKey])
+}
+
+// -----------------------------------------------------------------------------
+// KINSHIP & RELATIONSHIPS (EDGES)
+// -----------------------------------------------------------------------------
+
+// Defines the directed relationship between two nodes (e.g., Parent-Child, Spouses)
+model Edge {
+  id       String   @id @default(uuid())
+  sourceId String // E.g., Parent, Husband
+  targetId String // E.g., Child, Wife
+  type     EdgeType // e.g., PARENT_CHILD, SPOUSE
+  order    Int? // Tracks order for multiple spouses or sibling birth order
+
+  // Optional JSON metadata to handle extra statuses (e.g., active, divorced, widowed)
+  metadata Json?
+
+  source Node @relation("SourceNode", fields: [sourceId], references: [id], onDelete: Cascade)
+  target Node @relation("TargetNode", fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceId, targetId, type])
+}
+
+enum EdgeType {
+  PARENT_CHILD
+  SPOUSE
+}
