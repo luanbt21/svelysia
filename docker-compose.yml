@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: svelysia
     ports:
-      - '5432:5432'
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -24,6 +24,26 @@ services:
     volumes:
       - openobserve_data:/dataopentelemetry
 
+  rustfs:
+    image: rustfs/rustfs:latest
+    container_name: rustfs
+    ports:
+      - "9000:9000"
+    environment:
+      RUSTFS_ACCESS_KEY: rustfsadmin
+      RUSTFS_SECRET_KEY: rustfsadmin
+      # RUSTFS_VOLUMES: /data/rustfs{0...3}
+      # RUSTFS_ADDRESS: :7000
+      # RUSTFS_SERVER_DOMAINS: play.rustfs.com:7000
+      # RUSTFS_CONSOLE_ENABLE: true
+      # RUSTFS_CONSOLE_ADDRESS: :7001
+      # RUSTFS_OBS_CONFIG: /etc/default/obs.toml
+      # RUSTFS_TLS_PATH: /opt/tls
+    volumes:
+      - rustfs_data:/data
+    restart: unless-stopped
+
 volumes:
-  openobserve_data:
   postgres_data:
+  openobserve_data:
+  rustfs_data:

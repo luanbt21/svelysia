@@ -1,9 +1,10 @@
-import { env } from "$env/dynamic/private";
+import { getRequestEvent } from "$app/server";
+import { db } from "$lib/server/db";
+import { env } from "$lib/server/env";
 import { zenstackAdapter } from "@zenstackhq/better-auth";
 import { betterAuth } from "better-auth";
 import { admin, anonymous, emailOTP, phoneNumber, username } from "better-auth/plugins";
-
-import { db } from "$lib/server/db";
+import { sveltekitCookies } from "better-auth/svelte-kit";
 
 export const auth = betterAuth({
   database: zenstackAdapter(db, { provider: "postgresql" }),
@@ -16,16 +17,11 @@ export const auth = betterAuth({
         defaultValue: "user",
         input: false, // don't allow user to set role
       },
-      lang: {
-        type: "string",
-        required: false,
-        defaultValue: "en",
-      },
+      lang: { type: "string", required: false, defaultValue: "en" },
     },
   },
   emailAndPassword: { enabled: true },
   plugins: [
-    // sveltekitCookies(getRequestEvent),
     admin(),
     anonymous(),
     username(),
@@ -57,12 +53,17 @@ export const auth = betterAuth({
     //     },
     //   ],
     // }),
+    sveltekitCookies(getRequestEvent),
   ],
   socialProviders: {
     google: {
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
     },
+    github: {
+      clientId: env.GITHUB_CLIENT_ID,
+      clientSecret: env.GITHUB_CLIENT_SECRET,
+    },
   },
-  trustedOrigins: ["http://localhost:3000"],
+  trustedOrigins: [env.ORIGIN],
 });

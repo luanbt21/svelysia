@@ -27,12 +27,7 @@ if (svelteHandler) {
 app
   .use(
     openapi({
-      documentation: {
-        info: {
-          title: "Svelysia Documentation",
-          version: "1.0.0",
-        },
-      },
+      documentation: { info: { title: "Svelysia Documentation", version: "1.0.0" } },
       references: fromTypes(),
     }),
   )
