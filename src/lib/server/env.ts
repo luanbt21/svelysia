@@ -18,16 +18,23 @@ const TracingEnabled = Type.Object({
   OPEN_OBSERVE_PASSWORD: Type.String({ minLength: 1 }),
 });
 
-// const TracingDisabled = Type.Object({
-//   ENABLE_TRACING: Type.Literal(false, { default: false }),
-//   OPEN_OBSERVE_ORGANIZATION: Type.Optional(Type.String()),
-//   OPEN_OBSERVE_STREAM_NAME: Type.Optional(Type.String()),
-//   OPEN_OBSERVE_URL: Type.Optional(Type.String()),
-//   OPEN_OBSERVE_EMAIL: Type.Optional(Type.String()),
-//   OPEN_OBSERVE_PASSWORD: Type.Optional(Type.String()),
-// });
+const S3Env = Type.Object({
+  AWS_ACCESS_KEY_ID: Type.String(),
+  AWS_SECRET_ACCESS_KEY: Type.String(),
+  S3_ENDPOINT: Type.String(),
+  AWS_REGION: Type.String(),
+  S3_BUCKET: Type.String(),
+});
 
-const EnvSchema = Type.Intersect([CommonVars, TracingEnabled]);
+const AuthEnv = Type.Object({
+  ORIGIN: Type.String(),
+  GOOGLE_CLIENT_ID: Type.String(),
+  GOOGLE_CLIENT_SECRET: Type.String(),
+  GITHUB_CLIENT_ID: Type.String(),
+  GITHUB_CLIENT_SECRET: Type.String(),
+});
+
+const EnvSchema = Type.Intersect([CommonVars, TracingEnabled, S3Env, AuthEnv]);
 
 export type Env = Static<typeof EnvSchema>;
 

@@ -1,8 +1,9 @@
 {
-  "cSpell.words": [
-    "Elysia",
-    "elysiajs",
-    "multistream",
-    "Openobserve"
-  ]
+  "cSpell.words": ["Elysia", "elysiajs", "multistream", "Openobserve", "Paraglide", "Svelysia"],
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+  "files.associations": {
+    "*.css": "tailwindcss"
+  }
 }

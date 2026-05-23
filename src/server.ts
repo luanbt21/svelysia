@@ -1,10 +1,10 @@
+import { fromTypes, openapi } from "@elysiajs/openapi";
 import { opentelemetry } from "@elysiajs/opentelemetry";
 import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-node";
-import { Elysia, t } from "elysia";
-import { openapi, fromTypes } from "@elysiajs/openapi";
-import { env } from "./api/env";
+import { Elysia } from "elysia";
 
-import { logger, traceExporter } from "./api/prelude";
+import { env } from "$lib/server/env";
+import { logger, traceExporter } from "$lib/server/logger";
 import { routes } from "./api/routes";
 import { getSvelteHandler } from "./api/setup";
 
@@ -27,12 +27,7 @@ if (svelteHandler) {
 app
   .use(
     openapi({
-      documentation: {
-        info: {
-          title: "Elysia Documentation",
-          version: "1.0.0",
-        },
-      },
+      documentation: { info: { title: "Svelysia Documentation", version: "1.0.0" } },
       references: fromTypes(),
     }),
   )
@@ -49,31 +44,18 @@ app
   .onBeforeHandle(({ log, params, query, body }) => {
     log.info({ params, query, body }, "Incoming request");
   })
-
-  .post(
-    "api/test",
-    function test({ body }) {
-      return body;
-    },
-    {
-      body: t.Object({
-        name: t.String(),
-      }),
-    },
-  )
   .use(routes);
 
 app.listen(3000);
 
 const handleShutdown = async () => {
-  console.log("\nShutting down gracefully...");
+  logger.info("\nShutting down gracefully...");
   await app.stop(true);
 
-  console.log("Server stopped. Exiting process.");
+  logger.info("Server stopped. Exiting process.");
   process.exit(0);
 };
 
-// Listen for termination signals
 process.on("SIGINT", handleShutdown);
 process.on("SIGTERM", handleShutdown);
 

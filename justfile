@@ -4,6 +4,10 @@ set shell := ["bash", "-c"]
 default:
     @just --list
 
+# Generate the schema
+generate:
+    bunx zen generate --output ./src/lib/zenstack
+
 # Start the frontend dev server
 dev:
     bun --bun vite dev
@@ -55,7 +59,7 @@ docker-build:
 
 # Run the Docker container
 docker-run:
-    docker run -p 3000:3000 --env-file .env.local --name svelysia svelysia
+    docker run -p 3000:3000 --env-file .env --name svelysia svelysia
 
 docker-stop:
     docker stop svelysia

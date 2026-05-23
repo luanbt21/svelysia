@@ -1,3 +1,4 @@
+import { logger } from "$lib/server/logger";
 import type { MaybePromise } from "bun";
 
 type SvelteHandler = {
@@ -23,7 +24,7 @@ export async function getSvelteHandler(): Promise<SvelteHandler | undefined> {
     const module = await import(buildPath);
     return module.getHandler();
   } catch (error) {
-    console.error(`Error loading SvelteKit handler from ${buildPath}:`, error);
+    logger.error(error, `Error loading SvelteKit handler from ${buildPath}`);
     return undefined;
   }
 }

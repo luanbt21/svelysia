@@ -39,3 +39,6 @@ vite.config.ts.timestamp-*
 **/*.log
 package-lock.json
 **/*.bun
+# Paraglide
+src/lib/paraglide
+project.inlang/cache/

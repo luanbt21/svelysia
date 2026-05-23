@@ -1,19 +1,19 @@
+import { paraglideVitePlugin } from "@inlang/paraglide-js";
+import { sveltekit } from "@sveltejs/kit/vite";
+import tailwindcss from "@tailwindcss/vite";
+import { playwright } from "@vitest/browser-playwright";
 import devtoolsJson from "vite-plugin-devtools-json";
 import { defineConfig } from "vitest/config";
-import { playwright } from "@vitest/browser-playwright";
-import { sveltekit } from "@sveltejs/kit/vite";
-import UnoCSS from "unocss/vite";
-import extractorSvelte from "@unocss/extractor-svelte";
 
 export default defineConfig({
   plugins: [
-    UnoCSS({
-      extractors: [extractorSvelte()],
-    }),
+    tailwindcss(),
     sveltekit(),
     devtoolsJson(),
+    paraglideVitePlugin({ project: "./project.inlang", outdir: "./src/lib/paraglide" }),
   ],
   server: {},
+
   test: {
     expect: { requireAssertions: true },
     projects: [
