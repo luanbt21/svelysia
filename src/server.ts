@@ -13,7 +13,12 @@ if (!env.ENABLE_TRACING) {
 }
 logger.info("Starting application");
 
-const app = new Elysia();
+const app = new Elysia().use(
+  openapi({
+    documentation: { info: { title: "Svelysia Documentation", version: "1.0.0" } },
+    references: fromTypes(),
+  }),
+);
 
 const svelteHandler = await getSvelteHandler();
 if (svelteHandler) {
@@ -24,13 +29,8 @@ if (svelteHandler) {
   app.get("/", () => "Elysia is running (SvelteKit not found)");
 }
 
-app
-  .use(
-    openapi({
-      documentation: { info: { title: "Svelysia Documentation", version: "1.0.0" } },
-      references: fromTypes(),
-    }),
-  )
+// instance for API routes with logging and tracing
+const apiRoutes = new Elysia()
   .use(
     opentelemetry(
       env.ENABLE_TRACING ? { spanProcessors: [new BatchSpanProcessor(traceExporter)] } : {},
@@ -46,6 +46,9 @@ app
   })
   .use(routes);
 
+export type App = typeof apiRoutes;
+
+app.use(apiRoutes);
 app.listen(3000);
 
 const handleShutdown = async () => {

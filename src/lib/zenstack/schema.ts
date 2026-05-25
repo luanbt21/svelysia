@@ -5,1164 +5,794 @@
 
 /* eslint-disable */
 
-import {
-  type SchemaDef,
-  type AttributeApplication,
-  type FieldDefault,
-  ExpressionUtils,
-} from "@zenstackhq/schema";
+import { type SchemaDef, type AttributeApplication, type FieldDefault, ExpressionUtils } from "@zenstackhq/schema";
 export class SchemaType implements SchemaDef {
-  provider = {
-    type: "postgresql",
-  } as const;
-  models = {
-    User: {
-      name: "User",
-      fields: {
-        id: {
-          name: "id",
-          type: "String",
-          id: true,
-          attributes: [{ name: "@id" }] as readonly AttributeApplication[],
-        },
-        name: {
-          name: "name",
-          type: "String",
-        },
-        email: {
-          name: "email",
-          type: "String",
-        },
-        emailVerified: {
-          name: "emailVerified",
-          type: "Boolean",
-          attributes: [
-            { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(false) }] },
-          ] as readonly AttributeApplication[],
-          default: false as FieldDefault,
-        },
-        image: {
-          name: "image",
-          type: "String",
-          optional: true,
-        },
-        createdAt: {
-          name: "createdAt",
-          type: "DateTime",
-          attributes: [
-            { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] },
-          ] as readonly AttributeApplication[],
-          default: ExpressionUtils.call("now") as FieldDefault,
-        },
-        updatedAt: {
-          name: "updatedAt",
-          type: "DateTime",
-          updatedAt: true,
-          attributes: [{ name: "@updatedAt" }] as readonly AttributeApplication[],
-        },
-        role: {
-          name: "role",
-          type: "String",
-          optional: true,
-          attributes: [
-            { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("user") }] },
-          ] as readonly AttributeApplication[],
-          default: "user" as FieldDefault,
-        },
-        banned: {
-          name: "banned",
-          type: "Boolean",
-          optional: true,
-          attributes: [
-            { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(false) }] },
-          ] as readonly AttributeApplication[],
-          default: false as FieldDefault,
-        },
-        banReason: {
-          name: "banReason",
-          type: "String",
-          optional: true,
-        },
-        banExpires: {
-          name: "banExpires",
-          type: "DateTime",
-          optional: true,
-        },
-        isAnonymous: {
-          name: "isAnonymous",
-          type: "Boolean",
-          optional: true,
-          attributes: [
-            { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(false) }] },
-          ] as readonly AttributeApplication[],
-          default: false as FieldDefault,
-        },
-        username: {
-          name: "username",
-          type: "String",
-          optional: true,
-        },
-        displayUsername: {
-          name: "displayUsername",
-          type: "String",
-          optional: true,
-        },
-        lang: {
-          name: "lang",
-          type: "String",
-          optional: true,
-          attributes: [
-            { name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("en") }] },
-          ] as readonly AttributeApplication[],
-          default: "en" as FieldDefault,
-        },
-        sessions: {
-          name: "sessions",
-          type: "Session",
-          array: true,
-          relation: { opposite: "user" },
-        },
-        accounts: {
-          name: "accounts",
-          type: "Account",
-          array: true,
-          relation: { opposite: "user" },
-        },
-        trees: {
-          name: "trees",
-          type: "TreeMember",
-          array: true,
-          relation: { opposite: "user" },
-        },
-        phoneNumber: {
-          name: "phoneNumber",
-          type: "String",
-          unique: true,
-          optional: true,
-          attributes: [{ name: "@unique" }] as readonly AttributeApplication[],
-        },
-        phoneNumberVerified: {
-          name: "phoneNumberVerified",
-          type: "Boolean",
-          optional: true,
-        },
-      },
-      attributes: [
-        {
-          name: "@@unique",
-          args: [
-            {
-              name: "fields",
-              value: ExpressionUtils.array("String", [ExpressionUtils.field("email")]),
-            },
-          ],
-        },
-        {
-          name: "@@unique",
-          args: [
-            {
-              name: "fields",
-              value: ExpressionUtils.array("String", [ExpressionUtils.field("username")]),
-            },
-          ],
-        },
-        { name: "@@map", args: [{ name: "name", value: ExpressionUtils.literal("user") }] },
-      ] as readonly AttributeApplication[],
-      idFields: ["id"],
-      uniqueFields: {
-        id: { type: "String" },
-        phoneNumber: { type: "String" },
-        email: { type: "String" },
-        username: { type: "String" },
-      },
-    },
-    Session: {
-      name: "Session",
-      fields: {
-        id: {
-          name: "id",
-          type: "String",
-          id: true,
-          attributes: [{ name: "@id" }] as readonly AttributeApplication[],
-        },
-        expiresAt: {
-          name: "expiresAt",
-          type: "DateTime",
-        },
-        token: {
-          name: "token",
-          type: "String",
-        },
-        createdAt: {
-          name: "createdAt",
-          type: "DateTime",
-          attributes: [
-            { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] },
-          ] as readonly AttributeApplication[],
-          default: ExpressionUtils.call("now") as FieldDefault,
-        },
-        updatedAt: {
-          name: "updatedAt",
-          type: "DateTime",
-          updatedAt: true,
-          attributes: [{ name: "@updatedAt" }] as readonly AttributeApplication[],
-        },
-        ipAddress: {
-          name: "ipAddress",
-          type: "String",
-          optional: true,
-        },
-        userAgent: {
-          name: "userAgent",
-          type: "String",
-          optional: true,
-        },
-        userId: {
-          name: "userId",
-          type: "String",
-          foreignKeyFor: ["user"] as readonly string[],
-        },
-        user: {
-          name: "user",
-          type: "User",
-          attributes: [
-            {
-              name: "@relation",
-              args: [
-                {
-                  name: "fields",
-                  value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]),
+    provider = {
+        type: "postgresql"
+    } as const;
+    models = {
+        User: {
+            name: "User",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    attributes: [{ name: "@id" }] as readonly AttributeApplication[]
                 },
-                {
-                  name: "references",
-                  value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]),
+                name: {
+                    name: "name",
+                    type: "String"
                 },
-                { name: "onDelete", value: ExpressionUtils.literal("Cascade") },
-              ],
-            },
-          ] as readonly AttributeApplication[],
-          relation: {
-            opposite: "sessions",
-            fields: ["userId"],
-            references: ["id"],
-            onDelete: "Cascade",
-          },
-        },
-        impersonatedBy: {
-          name: "impersonatedBy",
-          type: "String",
-          optional: true,
-        },
-      },
-      attributes: [
-        {
-          name: "@@unique",
-          args: [
-            {
-              name: "fields",
-              value: ExpressionUtils.array("String", [ExpressionUtils.field("token")]),
-            },
-          ],
-        },
-        {
-          name: "@@index",
-          args: [
-            {
-              name: "fields",
-              value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]),
-            },
-          ],
-        },
-        { name: "@@map", args: [{ name: "name", value: ExpressionUtils.literal("session") }] },
-      ] as readonly AttributeApplication[],
-      idFields: ["id"],
-      uniqueFields: {
-        id: { type: "String" },
-        token: { type: "String" },
-      },
-    },
-    Account: {
-      name: "Account",
-      fields: {
-        id: {
-          name: "id",
-          type: "String",
-          id: true,
-          attributes: [{ name: "@id" }] as readonly AttributeApplication[],
-        },
-        accountId: {
-          name: "accountId",
-          type: "String",
-        },
-        providerId: {
-          name: "providerId",
-          type: "String",
-        },
-        userId: {
-          name: "userId",
-          type: "String",
-          foreignKeyFor: ["user"] as readonly string[],
-        },
-        user: {
-          name: "user",
-          type: "User",
-          attributes: [
-            {
-              name: "@relation",
-              args: [
-                {
-                  name: "fields",
-                  value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]),
+                email: {
+                    name: "email",
+                    type: "String"
                 },
-                {
-                  name: "references",
-                  value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]),
+                emailVerified: {
+                    name: "emailVerified",
+                    type: "Boolean",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(false) }] }] as readonly AttributeApplication[],
+                    default: false as FieldDefault
                 },
-                { name: "onDelete", value: ExpressionUtils.literal("Cascade") },
-              ],
-            },
-          ] as readonly AttributeApplication[],
-          relation: {
-            opposite: "accounts",
-            fields: ["userId"],
-            references: ["id"],
-            onDelete: "Cascade",
-          },
-        },
-        accessToken: {
-          name: "accessToken",
-          type: "String",
-          optional: true,
-        },
-        refreshToken: {
-          name: "refreshToken",
-          type: "String",
-          optional: true,
-        },
-        idToken: {
-          name: "idToken",
-          type: "String",
-          optional: true,
-        },
-        accessTokenExpiresAt: {
-          name: "accessTokenExpiresAt",
-          type: "DateTime",
-          optional: true,
-        },
-        refreshTokenExpiresAt: {
-          name: "refreshTokenExpiresAt",
-          type: "DateTime",
-          optional: true,
-        },
-        scope: {
-          name: "scope",
-          type: "String",
-          optional: true,
-        },
-        password: {
-          name: "password",
-          type: "String",
-          optional: true,
-        },
-        createdAt: {
-          name: "createdAt",
-          type: "DateTime",
-          attributes: [
-            { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] },
-          ] as readonly AttributeApplication[],
-          default: ExpressionUtils.call("now") as FieldDefault,
-        },
-        updatedAt: {
-          name: "updatedAt",
-          type: "DateTime",
-          updatedAt: true,
-          attributes: [{ name: "@updatedAt" }] as readonly AttributeApplication[],
-        },
-      },
-      attributes: [
-        {
-          name: "@@index",
-          args: [
-            {
-              name: "fields",
-              value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]),
-            },
-          ],
-        },
-        { name: "@@map", args: [{ name: "name", value: ExpressionUtils.literal("account") }] },
-      ] as readonly AttributeApplication[],
-      idFields: ["id"],
-      uniqueFields: {
-        id: { type: "String" },
-      },
-    },
-    Verification: {
-      name: "Verification",
-      fields: {
-        id: {
-          name: "id",
-          type: "String",
-          id: true,
-          attributes: [{ name: "@id" }] as readonly AttributeApplication[],
-        },
-        identifier: {
-          name: "identifier",
-          type: "String",
-        },
-        value: {
-          name: "value",
-          type: "String",
-        },
-        expiresAt: {
-          name: "expiresAt",
-          type: "DateTime",
-        },
-        createdAt: {
-          name: "createdAt",
-          type: "DateTime",
-          attributes: [
-            { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] },
-          ] as readonly AttributeApplication[],
-          default: ExpressionUtils.call("now") as FieldDefault,
-        },
-        updatedAt: {
-          name: "updatedAt",
-          type: "DateTime",
-          updatedAt: true,
-          attributes: [{ name: "@updatedAt" }] as readonly AttributeApplication[],
-        },
-      },
-      attributes: [
-        {
-          name: "@@index",
-          args: [
-            {
-              name: "fields",
-              value: ExpressionUtils.array("String", [ExpressionUtils.field("identifier")]),
-            },
-          ],
-        },
-        { name: "@@map", args: [{ name: "name", value: ExpressionUtils.literal("verification") }] },
-      ] as readonly AttributeApplication[],
-      idFields: ["id"],
-      uniqueFields: {
-        id: { type: "String" },
-      },
-    },
-    Tree: {
-      name: "Tree",
-      fields: {
-        id: {
-          name: "id",
-          type: "String",
-          id: true,
-          attributes: [
-            { name: "@id" },
-            { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] },
-          ] as readonly AttributeApplication[],
-          default: ExpressionUtils.call("uuid") as FieldDefault,
-        },
-        name: {
-          name: "name",
-          type: "String",
-        },
-        description: {
-          name: "description",
-          type: "String",
-          optional: true,
-        },
-        createdAt: {
-          name: "createdAt",
-          type: "DateTime",
-          attributes: [
-            { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] },
-          ] as readonly AttributeApplication[],
-          default: ExpressionUtils.call("now") as FieldDefault,
-        },
-        updatedAt: {
-          name: "updatedAt",
-          type: "DateTime",
-          updatedAt: true,
-          attributes: [{ name: "@updatedAt" }] as readonly AttributeApplication[],
-        },
-        members: {
-          name: "members",
-          type: "TreeMember",
-          array: true,
-          relation: { opposite: "tree" },
-        },
-        nodes: {
-          name: "nodes",
-          type: "Node",
-          array: true,
-          relation: { opposite: "tree" },
-        },
-        fields: {
-          name: "fields",
-          type: "CustomField",
-          array: true,
-          relation: { opposite: "tree" },
-        },
-        customTerms: {
-          name: "customTerms",
-          type: "CustomKinshipTerm",
-          array: true,
-          relation: { opposite: "tree" },
-        },
-      },
-      idFields: ["id"],
-      uniqueFields: {
-        id: { type: "String" },
-      },
-    },
-    TreeMember: {
-      name: "TreeMember",
-      fields: {
-        id: {
-          name: "id",
-          type: "String",
-          id: true,
-          attributes: [
-            { name: "@id" },
-            { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] },
-          ] as readonly AttributeApplication[],
-          default: ExpressionUtils.call("uuid") as FieldDefault,
-        },
-        treeId: {
-          name: "treeId",
-          type: "String",
-          foreignKeyFor: ["tree"] as readonly string[],
-        },
-        userId: {
-          name: "userId",
-          type: "String",
-          foreignKeyFor: ["user"] as readonly string[],
-        },
-        role: {
-          name: "role",
-          type: "String",
-        },
-        createdAt: {
-          name: "createdAt",
-          type: "DateTime",
-          attributes: [
-            { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] },
-          ] as readonly AttributeApplication[],
-          default: ExpressionUtils.call("now") as FieldDefault,
-        },
-        tree: {
-          name: "tree",
-          type: "Tree",
-          attributes: [
-            {
-              name: "@relation",
-              args: [
-                {
-                  name: "fields",
-                  value: ExpressionUtils.array("String", [ExpressionUtils.field("treeId")]),
+                image: {
+                    name: "image",
+                    type: "String",
+                    optional: true
                 },
-                {
-                  name: "references",
-                  value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]),
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
                 },
-                { name: "onDelete", value: ExpressionUtils.literal("Cascade") },
-              ],
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    attributes: [{ name: "@updatedAt" }] as readonly AttributeApplication[]
+                },
+                role: {
+                    name: "role",
+                    type: "String",
+                    optional: true,
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("user") }] }] as readonly AttributeApplication[],
+                    default: "user" as FieldDefault
+                },
+                banned: {
+                    name: "banned",
+                    type: "Boolean",
+                    optional: true,
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(false) }] }] as readonly AttributeApplication[],
+                    default: false as FieldDefault
+                },
+                banReason: {
+                    name: "banReason",
+                    type: "String",
+                    optional: true
+                },
+                banExpires: {
+                    name: "banExpires",
+                    type: "DateTime",
+                    optional: true
+                },
+                isAnonymous: {
+                    name: "isAnonymous",
+                    type: "Boolean",
+                    optional: true,
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(false) }] }] as readonly AttributeApplication[],
+                    default: false as FieldDefault
+                },
+                username: {
+                    name: "username",
+                    type: "String",
+                    optional: true
+                },
+                displayUsername: {
+                    name: "displayUsername",
+                    type: "String",
+                    optional: true
+                },
+                lang: {
+                    name: "lang",
+                    type: "String",
+                    optional: true,
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("en") }] }] as readonly AttributeApplication[],
+                    default: "en" as FieldDefault
+                },
+                sessions: {
+                    name: "sessions",
+                    type: "Session",
+                    array: true,
+                    relation: { opposite: "user" }
+                },
+                accounts: {
+                    name: "accounts",
+                    type: "Account",
+                    array: true,
+                    relation: { opposite: "user" }
+                },
+                trees: {
+                    name: "trees",
+                    type: "TreeMember",
+                    array: true,
+                    relation: { opposite: "user" }
+                },
+                phoneNumber: {
+                    name: "phoneNumber",
+                    type: "String",
+                    unique: true,
+                    optional: true,
+                    attributes: [{ name: "@unique" }] as readonly AttributeApplication[]
+                },
+                phoneNumberVerified: {
+                    name: "phoneNumberVerified",
+                    type: "Boolean",
+                    optional: true
+                }
             },
-          ] as readonly AttributeApplication[],
-          relation: {
-            opposite: "members",
-            fields: ["treeId"],
-            references: ["id"],
-            onDelete: "Cascade",
-          },
+            attributes: [
+                { name: "@@unique", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("email")]) }] },
+                { name: "@@unique", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("username")]) }] },
+                { name: "@@map", args: [{ name: "name", value: ExpressionUtils.literal("user") }] }
+            ] as readonly AttributeApplication[],
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" },
+                phoneNumber: { type: "String" },
+                email: { type: "String" },
+                username: { type: "String" }
+            }
         },
-        user: {
-          name: "user",
-          type: "User",
-          attributes: [
-            {
-              name: "@relation",
-              args: [
-                {
-                  name: "fields",
-                  value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]),
+        Session: {
+            name: "Session",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    attributes: [{ name: "@id" }] as readonly AttributeApplication[]
                 },
-                {
-                  name: "references",
-                  value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]),
+                expiresAt: {
+                    name: "expiresAt",
+                    type: "DateTime"
                 },
-                { name: "onDelete", value: ExpressionUtils.literal("Cascade") },
-              ],
+                token: {
+                    name: "token",
+                    type: "String"
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    attributes: [{ name: "@updatedAt" }] as readonly AttributeApplication[]
+                },
+                ipAddress: {
+                    name: "ipAddress",
+                    type: "String",
+                    optional: true
+                },
+                userAgent: {
+                    name: "userAgent",
+                    type: "String",
+                    optional: true
+                },
+                userId: {
+                    name: "userId",
+                    type: "String",
+                    foreignKeyFor: [
+                        "user"
+                    ] as readonly string[]
+                },
+                user: {
+                    name: "user",
+                    type: "User",
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "sessions", fields: ["userId"], references: ["id"], onDelete: "Cascade" }
+                },
+                impersonatedBy: {
+                    name: "impersonatedBy",
+                    type: "String",
+                    optional: true
+                }
             },
-          ] as readonly AttributeApplication[],
-          relation: {
-            opposite: "trees",
-            fields: ["userId"],
-            references: ["id"],
-            onDelete: "Cascade",
-          },
+            attributes: [
+                { name: "@@unique", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("token")]) }] },
+                { name: "@@index", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]) }] },
+                { name: "@@map", args: [{ name: "name", value: ExpressionUtils.literal("session") }] }
+            ] as readonly AttributeApplication[],
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" },
+                token: { type: "String" }
+            }
         },
-      },
-      attributes: [
-        {
-          name: "@@unique",
-          args: [
-            {
-              name: "fields",
-              value: ExpressionUtils.array("String", [
-                ExpressionUtils.field("treeId"),
-                ExpressionUtils.field("userId"),
-              ]),
-            },
-          ],
-        },
-      ] as readonly AttributeApplication[],
-      idFields: ["id"],
-      uniqueFields: {
-        id: { type: "String" },
-        treeId_userId: { treeId: { type: "String" }, userId: { type: "String" } },
-      },
-    },
-    Node: {
-      name: "Node",
-      fields: {
-        id: {
-          name: "id",
-          type: "String",
-          id: true,
-          attributes: [
-            { name: "@id" },
-            { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] },
-          ] as readonly AttributeApplication[],
-          default: ExpressionUtils.call("uuid") as FieldDefault,
-        },
-        treeId: {
-          name: "treeId",
-          type: "String",
-          foreignKeyFor: ["tree"] as readonly string[],
-        },
-        firstName: {
-          name: "firstName",
-          type: "String",
-        },
-        lastName: {
-          name: "lastName",
-          type: "String",
-          optional: true,
-        },
-        gender: {
-          name: "gender",
-          type: "Gender",
-        },
-        idCardNumber: {
-          name: "idCardNumber",
-          type: "String",
-          optional: true,
-        },
-        birthDate: {
-          name: "birthDate",
-          type: "DateTime",
-        },
-        deathDate: {
-          name: "deathDate",
-          type: "DateTime",
-          optional: true,
-        },
-        lunarBirthDate: {
-          name: "lunarBirthDate",
-          type: "String",
-          optional: true,
-        },
-        lunarDeathDate: {
-          name: "lunarDeathDate",
-          type: "String",
-          optional: true,
-        },
-        phone: {
-          name: "phone",
-          type: "String",
-          optional: true,
-        },
-        email: {
-          name: "email",
-          type: "String",
-          optional: true,
-        },
-        major: {
-          name: "major",
-          type: "String",
-          optional: true,
-        },
-        jobPosition: {
-          name: "jobPosition",
-          type: "String",
-          optional: true,
-        },
-        createdAt: {
-          name: "createdAt",
-          type: "DateTime",
-          attributes: [
-            { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] },
-          ] as readonly AttributeApplication[],
-          default: ExpressionUtils.call("now") as FieldDefault,
-        },
-        updatedAt: {
-          name: "updatedAt",
-          type: "DateTime",
-          updatedAt: true,
-          attributes: [{ name: "@updatedAt" }] as readonly AttributeApplication[],
-        },
-        tree: {
-          name: "tree",
-          type: "Tree",
-          attributes: [
-            {
-              name: "@relation",
-              args: [
-                {
-                  name: "fields",
-                  value: ExpressionUtils.array("String", [ExpressionUtils.field("treeId")]),
+        Account: {
+            name: "Account",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    attributes: [{ name: "@id" }] as readonly AttributeApplication[]
                 },
-                {
-                  name: "references",
-                  value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]),
+                accountId: {
+                    name: "accountId",
+                    type: "String"
                 },
-                { name: "onDelete", value: ExpressionUtils.literal("Cascade") },
-              ],
-            },
-          ] as readonly AttributeApplication[],
-          relation: {
-            opposite: "nodes",
-            fields: ["treeId"],
-            references: ["id"],
-            onDelete: "Cascade",
-          },
-        },
-        customValues: {
-          name: "customValues",
-          type: "CustomFieldValue",
-          array: true,
-          relation: { opposite: "node" },
-        },
-        relationsAsSource: {
-          name: "relationsAsSource",
-          type: "Edge",
-          array: true,
-          attributes: [
-            {
-              name: "@relation",
-              args: [{ name: "name", value: ExpressionUtils.literal("SourceNode") }],
-            },
-          ] as readonly AttributeApplication[],
-          relation: { opposite: "source", name: "SourceNode" },
-        },
-        relationsAsTarget: {
-          name: "relationsAsTarget",
-          type: "Edge",
-          array: true,
-          attributes: [
-            {
-              name: "@relation",
-              args: [{ name: "name", value: ExpressionUtils.literal("TargetNode") }],
-            },
-          ] as readonly AttributeApplication[],
-          relation: { opposite: "target", name: "TargetNode" },
-        },
-      },
-      idFields: ["id"],
-      uniqueFields: {
-        id: { type: "String" },
-      },
-    },
-    CustomField: {
-      name: "CustomField",
-      fields: {
-        id: {
-          name: "id",
-          type: "String",
-          id: true,
-          attributes: [
-            { name: "@id" },
-            { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] },
-          ] as readonly AttributeApplication[],
-          default: ExpressionUtils.call("uuid") as FieldDefault,
-        },
-        treeId: {
-          name: "treeId",
-          type: "String",
-          foreignKeyFor: ["tree"] as readonly string[],
-        },
-        name: {
-          name: "name",
-          type: "String",
-        },
-        type: {
-          name: "type",
-          type: "String",
-        },
-        tree: {
-          name: "tree",
-          type: "Tree",
-          attributes: [
-            {
-              name: "@relation",
-              args: [
-                {
-                  name: "fields",
-                  value: ExpressionUtils.array("String", [ExpressionUtils.field("treeId")]),
+                providerId: {
+                    name: "providerId",
+                    type: "String"
                 },
-                {
-                  name: "references",
-                  value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]),
+                userId: {
+                    name: "userId",
+                    type: "String",
+                    foreignKeyFor: [
+                        "user"
+                    ] as readonly string[]
                 },
-                { name: "onDelete", value: ExpressionUtils.literal("Cascade") },
-              ],
+                user: {
+                    name: "user",
+                    type: "User",
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "accounts", fields: ["userId"], references: ["id"], onDelete: "Cascade" }
+                },
+                accessToken: {
+                    name: "accessToken",
+                    type: "String",
+                    optional: true
+                },
+                refreshToken: {
+                    name: "refreshToken",
+                    type: "String",
+                    optional: true
+                },
+                idToken: {
+                    name: "idToken",
+                    type: "String",
+                    optional: true
+                },
+                accessTokenExpiresAt: {
+                    name: "accessTokenExpiresAt",
+                    type: "DateTime",
+                    optional: true
+                },
+                refreshTokenExpiresAt: {
+                    name: "refreshTokenExpiresAt",
+                    type: "DateTime",
+                    optional: true
+                },
+                scope: {
+                    name: "scope",
+                    type: "String",
+                    optional: true
+                },
+                password: {
+                    name: "password",
+                    type: "String",
+                    optional: true
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    attributes: [{ name: "@updatedAt" }] as readonly AttributeApplication[]
+                }
             },
-          ] as readonly AttributeApplication[],
-          relation: {
-            opposite: "fields",
-            fields: ["treeId"],
-            references: ["id"],
-            onDelete: "Cascade",
-          },
+            attributes: [
+                { name: "@@index", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]) }] },
+                { name: "@@map", args: [{ name: "name", value: ExpressionUtils.literal("account") }] }
+            ] as readonly AttributeApplication[],
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" }
+            }
         },
-        values: {
-          name: "values",
-          type: "CustomFieldValue",
-          array: true,
-          relation: { opposite: "field" },
-        },
-      },
-      attributes: [
-        {
-          name: "@@unique",
-          args: [
-            {
-              name: "fields",
-              value: ExpressionUtils.array("String", [
-                ExpressionUtils.field("treeId"),
-                ExpressionUtils.field("name"),
-              ]),
+        Verification: {
+            name: "Verification",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    attributes: [{ name: "@id" }] as readonly AttributeApplication[]
+                },
+                identifier: {
+                    name: "identifier",
+                    type: "String"
+                },
+                value: {
+                    name: "value",
+                    type: "String"
+                },
+                expiresAt: {
+                    name: "expiresAt",
+                    type: "DateTime"
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    attributes: [{ name: "@updatedAt" }] as readonly AttributeApplication[]
+                }
             },
-          ],
+            attributes: [
+                { name: "@@index", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("identifier")]) }] },
+                { name: "@@map", args: [{ name: "name", value: ExpressionUtils.literal("verification") }] }
+            ] as readonly AttributeApplication[],
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" }
+            }
         },
-      ] as readonly AttributeApplication[],
-      idFields: ["id"],
-      uniqueFields: {
-        id: { type: "String" },
-        treeId_name: { treeId: { type: "String" }, name: { type: "String" } },
-      },
-    },
-    CustomFieldValue: {
-      name: "CustomFieldValue",
-      fields: {
-        id: {
-          name: "id",
-          type: "String",
-          id: true,
-          attributes: [
-            { name: "@id" },
-            { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] },
-          ] as readonly AttributeApplication[],
-          default: ExpressionUtils.call("uuid") as FieldDefault,
-        },
-        nodeId: {
-          name: "nodeId",
-          type: "String",
-          foreignKeyFor: ["node"] as readonly string[],
-        },
-        fieldId: {
-          name: "fieldId",
-          type: "String",
-          foreignKeyFor: ["field"] as readonly string[],
-        },
-        value: {
-          name: "value",
-          type: "String",
-        },
-        node: {
-          name: "node",
-          type: "Node",
-          attributes: [
-            {
-              name: "@relation",
-              args: [
-                {
-                  name: "fields",
-                  value: ExpressionUtils.array("String", [ExpressionUtils.field("nodeId")]),
+        Tree: {
+            name: "Tree",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
-                {
-                  name: "references",
-                  value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]),
+                name: {
+                    name: "name",
+                    type: "String"
                 },
-                { name: "onDelete", value: ExpressionUtils.literal("Cascade") },
-              ],
+                description: {
+                    name: "description",
+                    type: "String",
+                    optional: true
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    attributes: [{ name: "@updatedAt" }] as readonly AttributeApplication[]
+                },
+                members: {
+                    name: "members",
+                    type: "TreeMember",
+                    array: true,
+                    relation: { opposite: "tree" }
+                },
+                nodes: {
+                    name: "nodes",
+                    type: "Node",
+                    array: true,
+                    relation: { opposite: "tree" }
+                },
+                fields: {
+                    name: "fields",
+                    type: "CustomField",
+                    array: true,
+                    relation: { opposite: "tree" }
+                },
+                customTerms: {
+                    name: "customTerms",
+                    type: "CustomKinshipTerm",
+                    array: true,
+                    relation: { opposite: "tree" }
+                }
             },
-          ] as readonly AttributeApplication[],
-          relation: {
-            opposite: "customValues",
-            fields: ["nodeId"],
-            references: ["id"],
-            onDelete: "Cascade",
-          },
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" }
+            }
         },
-        field: {
-          name: "field",
-          type: "CustomField",
-          attributes: [
-            {
-              name: "@relation",
-              args: [
-                {
-                  name: "fields",
-                  value: ExpressionUtils.array("String", [ExpressionUtils.field("fieldId")]),
+        TreeMember: {
+            name: "TreeMember",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
-                {
-                  name: "references",
-                  value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]),
+                treeId: {
+                    name: "treeId",
+                    type: "String",
+                    foreignKeyFor: [
+                        "tree"
+                    ] as readonly string[]
                 },
-                { name: "onDelete", value: ExpressionUtils.literal("Cascade") },
-              ],
+                userId: {
+                    name: "userId",
+                    type: "String",
+                    foreignKeyFor: [
+                        "user"
+                    ] as readonly string[]
+                },
+                role: {
+                    name: "role",
+                    type: "String"
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                tree: {
+                    name: "tree",
+                    type: "Tree",
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("treeId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "members", fields: ["treeId"], references: ["id"], onDelete: "Cascade" }
+                },
+                user: {
+                    name: "user",
+                    type: "User",
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "trees", fields: ["userId"], references: ["id"], onDelete: "Cascade" }
+                }
             },
-          ] as readonly AttributeApplication[],
-          relation: {
-            opposite: "values",
-            fields: ["fieldId"],
-            references: ["id"],
-            onDelete: "Cascade",
-          },
+            attributes: [
+                { name: "@@unique", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("treeId"), ExpressionUtils.field("userId")]) }] }
+            ] as readonly AttributeApplication[],
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" },
+                treeId_userId: { treeId: { type: "String" }, userId: { type: "String" } }
+            }
         },
-      },
-      attributes: [
-        {
-          name: "@@unique",
-          args: [
-            {
-              name: "fields",
-              value: ExpressionUtils.array("String", [
-                ExpressionUtils.field("nodeId"),
-                ExpressionUtils.field("fieldId"),
-              ]),
-            },
-          ],
-        },
-      ] as readonly AttributeApplication[],
-      idFields: ["id"],
-      uniqueFields: {
-        id: { type: "String" },
-        nodeId_fieldId: { nodeId: { type: "String" }, fieldId: { type: "String" } },
-      },
-    },
-    CustomKinshipTerm: {
-      name: "CustomKinshipTerm",
-      fields: {
-        id: {
-          name: "id",
-          type: "String",
-          id: true,
-          attributes: [
-            { name: "@id" },
-            { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] },
-          ] as readonly AttributeApplication[],
-          default: ExpressionUtils.call("uuid") as FieldDefault,
-        },
-        treeId: {
-          name: "treeId",
-          type: "String",
-          foreignKeyFor: ["tree"] as readonly string[],
-        },
-        pathKey: {
-          name: "pathKey",
-          type: "String",
-        },
-        term: {
-          name: "term",
-          type: "String",
-        },
-        tree: {
-          name: "tree",
-          type: "Tree",
-          attributes: [
-            {
-              name: "@relation",
-              args: [
-                {
-                  name: "fields",
-                  value: ExpressionUtils.array("String", [ExpressionUtils.field("treeId")]),
+        Node: {
+            name: "Node",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("uuid") as FieldDefault
                 },
-                {
-                  name: "references",
-                  value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]),
+                treeId: {
+                    name: "treeId",
+                    type: "String",
+                    foreignKeyFor: [
+                        "tree"
+                    ] as readonly string[]
                 },
-                { name: "onDelete", value: ExpressionUtils.literal("Cascade") },
-              ],
-            },
-          ] as readonly AttributeApplication[],
-          relation: {
-            opposite: "customTerms",
-            fields: ["treeId"],
-            references: ["id"],
-            onDelete: "Cascade",
-          },
-        },
-      },
-      attributes: [
-        {
-          name: "@@unique",
-          args: [
-            {
-              name: "fields",
-              value: ExpressionUtils.array("String", [
-                ExpressionUtils.field("treeId"),
-                ExpressionUtils.field("pathKey"),
-              ]),
-            },
-          ],
-        },
-      ] as readonly AttributeApplication[],
-      idFields: ["id"],
-      uniqueFields: {
-        id: { type: "String" },
-        treeId_pathKey: { treeId: { type: "String" }, pathKey: { type: "String" } },
-      },
-    },
-    Edge: {
-      name: "Edge",
-      fields: {
-        id: {
-          name: "id",
-          type: "String",
-          id: true,
-          attributes: [
-            { name: "@id" },
-            { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] },
-          ] as readonly AttributeApplication[],
-          default: ExpressionUtils.call("uuid") as FieldDefault,
-        },
-        sourceId: {
-          name: "sourceId",
-          type: "String",
-          foreignKeyFor: ["source"] as readonly string[],
-        },
-        targetId: {
-          name: "targetId",
-          type: "String",
-          foreignKeyFor: ["target"] as readonly string[],
-        },
-        type: {
-          name: "type",
-          type: "EdgeType",
-        },
-        order: {
-          name: "order",
-          type: "Int",
-          optional: true,
-        },
-        metadata: {
-          name: "metadata",
-          type: "Json",
-          optional: true,
-        },
-        source: {
-          name: "source",
-          type: "Node",
-          attributes: [
-            {
-              name: "@relation",
-              args: [
-                { name: "name", value: ExpressionUtils.literal("SourceNode") },
-                {
-                  name: "fields",
-                  value: ExpressionUtils.array("String", [ExpressionUtils.field("sourceId")]),
+                firstName: {
+                    name: "firstName",
+                    type: "String"
                 },
-                {
-                  name: "references",
-                  value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]),
+                lastName: {
+                    name: "lastName",
+                    type: "String",
+                    optional: true
                 },
-                { name: "onDelete", value: ExpressionUtils.literal("Cascade") },
-              ],
-            },
-          ] as readonly AttributeApplication[],
-          relation: {
-            opposite: "relationsAsSource",
-            name: "SourceNode",
-            fields: ["sourceId"],
-            references: ["id"],
-            onDelete: "Cascade",
-          },
-        },
-        target: {
-          name: "target",
-          type: "Node",
-          attributes: [
-            {
-              name: "@relation",
-              args: [
-                { name: "name", value: ExpressionUtils.literal("TargetNode") },
-                {
-                  name: "fields",
-                  value: ExpressionUtils.array("String", [ExpressionUtils.field("targetId")]),
+                gender: {
+                    name: "gender",
+                    type: "Gender"
                 },
-                {
-                  name: "references",
-                  value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]),
+                idCardNumber: {
+                    name: "idCardNumber",
+                    type: "String",
+                    optional: true
                 },
-                { name: "onDelete", value: ExpressionUtils.literal("Cascade") },
-              ],
+                birthDate: {
+                    name: "birthDate",
+                    type: "DateTime"
+                },
+                deathDate: {
+                    name: "deathDate",
+                    type: "DateTime",
+                    optional: true
+                },
+                lunarBirthDate: {
+                    name: "lunarBirthDate",
+                    type: "String",
+                    optional: true
+                },
+                lunarDeathDate: {
+                    name: "lunarDeathDate",
+                    type: "String",
+                    optional: true
+                },
+                phone: {
+                    name: "phone",
+                    type: "String",
+                    optional: true
+                },
+                email: {
+                    name: "email",
+                    type: "String",
+                    optional: true
+                },
+                major: {
+                    name: "major",
+                    type: "String",
+                    optional: true
+                },
+                jobPosition: {
+                    name: "jobPosition",
+                    type: "String",
+                    optional: true
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    attributes: [{ name: "@updatedAt" }] as readonly AttributeApplication[]
+                },
+                tree: {
+                    name: "tree",
+                    type: "Tree",
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("treeId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "nodes", fields: ["treeId"], references: ["id"], onDelete: "Cascade" }
+                },
+                customValues: {
+                    name: "customValues",
+                    type: "CustomFieldValue",
+                    array: true,
+                    relation: { opposite: "node" }
+                },
+                relationsAsSource: {
+                    name: "relationsAsSource",
+                    type: "Edge",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("SourceNode") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "source", name: "SourceNode" }
+                },
+                relationsAsTarget: {
+                    name: "relationsAsTarget",
+                    type: "Edge",
+                    array: true,
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("TargetNode") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "target", name: "TargetNode" }
+                }
             },
-          ] as readonly AttributeApplication[],
-          relation: {
-            opposite: "relationsAsTarget",
-            name: "TargetNode",
-            fields: ["targetId"],
-            references: ["id"],
-            onDelete: "Cascade",
-          },
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" }
+            }
         },
-      },
-      attributes: [
-        {
-          name: "@@unique",
-          args: [
-            {
-              name: "fields",
-              value: ExpressionUtils.array("String", [
-                ExpressionUtils.field("sourceId"),
-                ExpressionUtils.field("targetId"),
-                ExpressionUtils.field("type"),
-              ]),
+        CustomField: {
+            name: "CustomField",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("uuid") as FieldDefault
+                },
+                treeId: {
+                    name: "treeId",
+                    type: "String",
+                    foreignKeyFor: [
+                        "tree"
+                    ] as readonly string[]
+                },
+                name: {
+                    name: "name",
+                    type: "String"
+                },
+                type: {
+                    name: "type",
+                    type: "String"
+                },
+                tree: {
+                    name: "tree",
+                    type: "Tree",
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("treeId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "fields", fields: ["treeId"], references: ["id"], onDelete: "Cascade" }
+                },
+                values: {
+                    name: "values",
+                    type: "CustomFieldValue",
+                    array: true,
+                    relation: { opposite: "field" }
+                }
             },
-          ],
+            attributes: [
+                { name: "@@unique", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("treeId"), ExpressionUtils.field("name")]) }] }
+            ] as readonly AttributeApplication[],
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" },
+                treeId_name: { treeId: { type: "String" }, name: { type: "String" } }
+            }
         },
-      ] as readonly AttributeApplication[],
-      idFields: ["id"],
-      uniqueFields: {
-        id: { type: "String" },
-        sourceId_targetId_type: {
-          sourceId: { type: "String" },
-          targetId: { type: "String" },
-          type: { type: "EdgeType" },
+        CustomFieldValue: {
+            name: "CustomFieldValue",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("uuid") as FieldDefault
+                },
+                nodeId: {
+                    name: "nodeId",
+                    type: "String",
+                    foreignKeyFor: [
+                        "node"
+                    ] as readonly string[]
+                },
+                fieldId: {
+                    name: "fieldId",
+                    type: "String",
+                    foreignKeyFor: [
+                        "field"
+                    ] as readonly string[]
+                },
+                value: {
+                    name: "value",
+                    type: "String"
+                },
+                node: {
+                    name: "node",
+                    type: "Node",
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("nodeId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "customValues", fields: ["nodeId"], references: ["id"], onDelete: "Cascade" }
+                },
+                field: {
+                    name: "field",
+                    type: "CustomField",
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("fieldId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "values", fields: ["fieldId"], references: ["id"], onDelete: "Cascade" }
+                }
+            },
+            attributes: [
+                { name: "@@unique", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("nodeId"), ExpressionUtils.field("fieldId")]) }] }
+            ] as readonly AttributeApplication[],
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" },
+                nodeId_fieldId: { nodeId: { type: "String" }, fieldId: { type: "String" } }
+            }
         },
-      },
-    },
-  } as const;
-  enums = {
-    Gender: {
-      name: "Gender",
-      values: {
-        MALE: "MALE",
-        FEMALE: "FEMALE",
-      },
-    },
-    EdgeType: {
-      name: "EdgeType",
-      values: {
-        PARENT_CHILD: "PARENT_CHILD",
-        SPOUSE: "SPOUSE",
-      },
-    },
-  } as const;
-  authType = "User" as const;
-  plugins = {};
+        CustomKinshipTerm: {
+            name: "CustomKinshipTerm",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("uuid") as FieldDefault
+                },
+                treeId: {
+                    name: "treeId",
+                    type: "String",
+                    foreignKeyFor: [
+                        "tree"
+                    ] as readonly string[]
+                },
+                pathKey: {
+                    name: "pathKey",
+                    type: "String"
+                },
+                term: {
+                    name: "term",
+                    type: "String"
+                },
+                tree: {
+                    name: "tree",
+                    type: "Tree",
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("treeId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "customTerms", fields: ["treeId"], references: ["id"], onDelete: "Cascade" }
+                }
+            },
+            attributes: [
+                { name: "@@unique", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("treeId"), ExpressionUtils.field("pathKey")]) }] }
+            ] as readonly AttributeApplication[],
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" },
+                treeId_pathKey: { treeId: { type: "String" }, pathKey: { type: "String" } }
+            }
+        },
+        Edge: {
+            name: "Edge",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("uuid") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("uuid") as FieldDefault
+                },
+                sourceId: {
+                    name: "sourceId",
+                    type: "String",
+                    foreignKeyFor: [
+                        "source"
+                    ] as readonly string[]
+                },
+                targetId: {
+                    name: "targetId",
+                    type: "String",
+                    foreignKeyFor: [
+                        "target"
+                    ] as readonly string[]
+                },
+                type: {
+                    name: "type",
+                    type: "EdgeType"
+                },
+                order: {
+                    name: "order",
+                    type: "Int",
+                    optional: true
+                },
+                metadata: {
+                    name: "metadata",
+                    type: "Json",
+                    optional: true
+                },
+                source: {
+                    name: "source",
+                    type: "Node",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("SourceNode") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("sourceId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "relationsAsSource", name: "SourceNode", fields: ["sourceId"], references: ["id"], onDelete: "Cascade" }
+                },
+                target: {
+                    name: "target",
+                    type: "Node",
+                    attributes: [{ name: "@relation", args: [{ name: "name", value: ExpressionUtils.literal("TargetNode") }, { name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("targetId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "relationsAsTarget", name: "TargetNode", fields: ["targetId"], references: ["id"], onDelete: "Cascade" }
+                }
+            },
+            attributes: [
+                { name: "@@unique", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("sourceId"), ExpressionUtils.field("targetId"), ExpressionUtils.field("type")]) }] }
+            ] as readonly AttributeApplication[],
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" },
+                sourceId_targetId_type: { sourceId: { type: "String" }, targetId: { type: "String" }, type: { type: "EdgeType" } }
+            }
+        }
+    } as const;
+    enums = {
+        Gender: {
+            name: "Gender",
+            values: {
+                MALE: "MALE",
+                FEMALE: "FEMALE"
+            }
+        },
+        EdgeType: {
+            name: "EdgeType",
+            values: {
+                PARENT_CHILD: "PARENT_CHILD",
+                SPOUSE: "SPOUSE"
+            }
+        }
+    } as const;
+    authType = "User" as const;
+    plugins = {};
 }
 export const schema = new SchemaType();

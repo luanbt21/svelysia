@@ -15,7 +15,7 @@
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 
 <ModeWatcher />
-<Toaster />
+<Toaster position="top-center" />
 {@render children()}
 
 <div style="display:none">

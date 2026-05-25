@@ -1,0 +1,8 @@
+allowBuilds:
+  '@prisma/engines': set this to true or false
+  prisma: set this to true or false
+  protobufjs: set this to true or false
+minimumReleaseAgeExclude:
+  - '@aws-sdk/client-s3@3.1053.0'
+  - '@aws-sdk/s3-request-presigner@3.1053.0'
+  - '@sveltejs/kit@2.61.0'

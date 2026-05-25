@@ -11,7 +11,7 @@
 	import { toast } from "svelte-sonner";
 	import type { EventHandler } from "svelte/elements";
 
-	const callbackURL = page.url.searchParams.get("redirect") || "/";
+	const callbackURL = page.url.searchParams.get("redirect") || "/trees";
 	let pending = $state(false);
 
 	const handleSubmit: EventHandler<SubmitEvent, HTMLFormElement> = async (
@@ -28,14 +28,21 @@
 				return;
 			}
 
-			await authClient.signIn.email({
+			const { error } = await authClient.signIn.email({
 				email: email as string,
 				password: password as string,
 				callbackURL,
 			});
-		} catch (error) {
+
+			if (error) {
+				toast.error(error.message || "Failed to sign in");
+				return;
+			}
+
+			toast.success("Signed in successfully!");
+		} catch (err) {
 			toast.error("Failed to sign in");
-			console.error(error);
+			console.error(err);
 		} finally {
 			pending = false;
 		}
@@ -58,12 +65,6 @@
 			handle: () =>
 				authClient.signIn.social({ provider: "github", callbackURL }),
 		},
-		// {
-		// 	name: "Zitadel",
-		// 	icon: "/zitadel-logo.svg",
-		// 	handle: () =>
-		// 		authClient.signIn.oauth2({ providerId: "zitadel", callbackURL }),
-		// },
 	];
 </script>
 
@@ -97,6 +98,7 @@
 						name="email"
 						placeholder="you@example.com"
 						required
+						disabled={pending}
 					/>
 				</div>
 
@@ -104,7 +106,7 @@
 					<div class="flex items-center justify-between">
 						<Label for="password" class="text-sm">Password</Label>
 						<Button
-							href="/"
+							href="/forgot-password"
 							variant="link"
 							class="h-auto p-0 text-xs text-muted-foreground hover:text-foreground"
 						>
@@ -117,6 +119,7 @@
 						name="password"
 						placeholder="Enter your password"
 						required
+						disabled={pending}
 					/>
 				</div>
 
@@ -136,7 +139,7 @@
 
 			<div class="grid grid-cols-2 gap-3">
 				{#each socialProviders as provider}
-					<Button type="button" variant="outline">
+					<Button type="button" variant="outline" onclick={provider.handle} disabled={pending}>
 						<provider.icon class="size-4" />
 						<span>{provider.name}</span>
 					</Button>
@@ -146,7 +149,7 @@
 
 		<p class="mt-6 text-center text-sm text-muted-foreground">
 			Don't have an account?
-			<Button href="/" variant="link" class="px-1 font-medium text-primary"
+			<Button href="/register" variant="link" class="px-1 font-medium text-primary"
 				>Sign up</Button
 			>
 		</p>

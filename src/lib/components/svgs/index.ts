@@ -14,12 +14,10 @@ import Slack from "./slack.svelte";
 import Spotify from "./spotify.svelte";
 import SupabaseFull from "./supabase-full.svelte";
 import Supabase from "./supabase.svelte";
+import Svelte from "./svelte.svelte";
 import Twilio from "./twilio.svelte";
 import VercelFull from "./vercel-full.svelte";
 import Vercel from "./vercel.svelte";
-import Zitadel from "./zitadel.svelte";
-
-import Svelte from "./svelte.svelte";
 
 export {
   Beacon,
@@ -42,5 +40,4 @@ export {
   Twilio,
   Vercel,
   VercelFull,
-  Zitadel,
 };
