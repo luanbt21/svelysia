@@ -7,6 +7,7 @@
   import { toast } from "svelte-sonner";
   import { invalidateAll } from "$app/navigation";
   import { client } from "$lib";
+  import { m } from "$lib/paraglide/messages.js";
 
   let { data } = $props();
 
@@ -18,7 +19,7 @@
   async function handleCreateTree(e: SubmitEvent) {
     e.preventDefault();
     if (!newTreeName.trim()) {
-      toast.error("Tree name is required");
+      toast.error(m.tree_name_required());
       return;
     }
     
@@ -30,16 +31,16 @@
       });
 
       if (error) {
-        throw new Error(error.value as string || "Failed to create family tree");
+        throw new Error(error.value as string || m.tree_create_failed());
       }
 
-      toast.success("Family tree created successfully!");
+      toast.success(m.tree_create_success());
       showCreateModal = false;
       newTreeName = "";
       newTreeDesc = "";
       await invalidateAll(); // Reload server-side data
     } catch (err) {
-      toast.error("Failed to create family tree");
+      toast.error(m.tree_create_failed());
       console.error(err);
     } finally {
       isSubmitting = false;
@@ -47,7 +48,7 @@
   }
 
   async function handleDeleteTree(id: string, name: string) {
-    if (!confirm(`Are you sure you want to delete "${name}"? This action is permanent and will delete all member nodes and relationships.`)) {
+    if (!confirm(m.tree_delete_confirm({ name }))) {
       return;
     }
 
@@ -55,13 +56,13 @@
       const { error } = await client.api.trees({ id }).delete();
 
       if (error) {
-        throw new Error(error.value as string || "Failed to delete family tree");
+        throw new Error(error.value as string || m.tree_delete_failed());
       }
 
-      toast.success("Family tree deleted");
+      toast.success(m.tree_delete_success());
       await invalidateAll();
     } catch (err) {
-      toast.error("Failed to delete family tree");
+      toast.error(m.tree_delete_failed());
       console.error(err);
     }
   }
@@ -72,15 +73,15 @@
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
     <div>
       <h1 class="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent font-serif">
-        Your Family Trees
+        {m.your_family_trees()}
       </h1>
       <p class="text-muted-foreground mt-1">
-        Manage your family lineages, trace connections, and collaborate with family members.
+        {m.trees_description()}
       </p>
     </div>
     <Button onclick={() => showCreateModal = true} class="flex items-center gap-2 shadow-lg">
       <Plus class="h-4 w-4" />
-      <span>New Family Tree</span>
+      <span>{m.new_family_tree()}</span>
     </Button>
   </div>
 
@@ -90,13 +91,13 @@
       <div class="p-4 rounded-full bg-primary/10 mb-4">
         <Users class="h-10 w-10 text-primary" />
       </div>
-      <h3 class="text-lg font-semibold">No Family Trees Found</h3>
+      <h3 class="text-lg font-semibold">{m.no_trees_found()}</h3>
       <p class="text-muted-foreground text-sm max-w-sm mt-2 mb-6">
-        Get started by creating your first family tree, or ask a collaborator to invite you to their tree.
+        {m.no_trees_desc()}
       </p>
       <Button onclick={() => showCreateModal = true} class="flex items-center gap-2">
         <Plus class="h-4 w-4" />
-        <span>Create Your First Tree</span>
+        <span>{m.create_first_tree()}</span>
       </Button>
     </div>
   {:else}
@@ -122,7 +123,7 @@
 
             <!-- Description -->
             <p class="text-sm text-muted-foreground line-clamp-3 mb-6 flex-1">
-              {tree.description || "No description provided. Add details about this lineage."}
+              {tree.description || m.no_description()}
             </p>
 
             <!-- Metadata (Created At) -->
@@ -139,10 +140,10 @@
             <Button href={`/trees/${tree.id}`} variant="default" size="sm" class="flex-1 gap-2">
               {#if tree.role === 'VIEWER'}
                 <Eye class="h-4 w-4" />
-                <span>View Tree</span>
+                <span>{m.view_tree()}</span>
               {:else}
                 <Edit3 class="h-4 w-4" />
-                <span>Edit Tree</span>
+                <span>{m.edit_tree()}</span>
               {/if}
             </Button>
             
@@ -152,7 +153,7 @@
                 size="icon" 
                 class="text-destructive hover:bg-destructive/10 hover:text-destructive hover:border-destructive/40 border-muted"
                 onclick={() => handleDeleteTree(tree.id, tree.name)}
-                title="Delete family tree"
+                title={m.delete_tree_title()}
               >
                 <Trash2 class="h-4 w-4" />
               </Button>
@@ -168,12 +169,12 @@
 {#if showCreateModal}
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
     <div class="w-full max-w-md bg-background border rounded-xl shadow-2xl p-6 relative animate-in fade-in zoom-in-95 duration-200">
-      <h3 class="font-serif text-2xl font-bold mb-2">Create New Tree</h3>
-      <p class="text-muted-foreground text-sm mb-4">Add details to start your genealogical trace.</p>
+      <h3 class="font-serif text-2xl font-bold mb-2">{m.create_new_tree_modal_title()}</h3>
+      <p class="text-muted-foreground text-sm mb-4">{m.create_tree_modal_desc()}</p>
 
       <form onsubmit={handleCreateTree} class="space-y-4">
         <div class="space-y-2">
-          <Label for="tree-name">Family Lineage Name</Label>
+          <Label for="tree-name">{m.family_lineage_name_label()}</Label>
           <Input 
             id="tree-name" 
             placeholder="e.g., Nguyễn Gia Tộc, Trần Family Tree" 
@@ -184,10 +185,10 @@
         </div>
 
         <div class="space-y-2">
-          <Label for="tree-desc">Description</Label>
+          <Label for="tree-desc">{m.tree_desc_label()}</Label>
           <textarea
             id="tree-desc"
-            placeholder="Describe the origin, branches, or notes about this lineage..."
+            placeholder={m.tree_desc_placeholder()}
             bind:value={newTreeDesc}
             disabled={isSubmitting}
             class="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
@@ -201,7 +202,7 @@
             onclick={() => showCreateModal = false}
             disabled={isSubmitting}
           >
-            Cancel
+            {m.cancel()}
           </Button>
           <Button 
             type="submit" 
@@ -209,9 +210,9 @@
             class="min-w-[80px]"
           >
             {#if isSubmitting}
-              Creating...
+              {m.creating()}
             {:else}
-              Create
+              {m.create()}
             {/if}
           </Button>
         </div>

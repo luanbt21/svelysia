@@ -5,16 +5,18 @@
   import { LogOut, FolderTree, User } from "@lucide/svelte";
   import { toast } from "svelte-sonner";
   import { goto } from "$app/navigation";
+  import { m } from "$lib/paraglide/messages.js";
+  import LanguageSwitcher from "$lib/components/language-switcher.svelte";
 
   let { data, children } = $props();
 
   async function handleSignOut() {
     try {
       await authClient.signOut();
-      toast.success("Signed out successfully");
+      toast.success(m.sign_out_success());
       goto("/login");
     } catch (error) {
-      toast.error("Failed to sign out");
+      toast.error(m.sign_out_failed());
       console.error(error);
     }
   }
@@ -46,11 +48,14 @@
           </span>
         </div>
 
+        <!-- Language Switcher -->
+        <LanguageSwitcher />
+
         <!-- Mode Watcher (Theme Toggle) -->
         <ModeToggle />
 
         <!-- Sign Out Button -->
-        <Button variant="ghost" size="icon" onclick={handleSignOut} title="Sign Out">
+        <Button variant="ghost" size="icon" onclick={handleSignOut} title={m.sign_out()}>
           <LogOut class="h-4 w-4" />
         </Button>
       </div>
@@ -62,3 +67,4 @@
     {@render children()}
   </main>
 </div>
+

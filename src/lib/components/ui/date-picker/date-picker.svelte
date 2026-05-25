@@ -1,24 +1,34 @@
 <script lang="ts">
+  import { Button } from "$lib/components/ui/button";
   import { Calendar } from "$lib/components/ui/calendar";
   import * as Popover from "$lib/components/ui/popover";
-  import { Button } from "$lib/components/ui/button";
-  import { Calendar as CalendarIcon } from "@lucide/svelte";
   import {
     CalendarDate,
     getLocalTimeZone,
     parseDate,
     today,
   } from "@internationalized/date";
+  import { Calendar as CalendarIcon } from "@lucide/svelte";
   import { Input } from "../input";
 
+  type DateValue = CalendarDate | Date | string | undefined;
+  type Props = {
+    value?: DateValue;
+    id: string;
+    placeholder?: string;
+    maxValue?: CalendarDate;
+    disabled?: boolean;
+    valueType?: "string" | "date" | "calendar";
+  };
+
   let {
-    value = $bindable<CalendarDate | Date | string | undefined>(),
+    value = $bindable<DateValue>(),
     id,
-    placeholder = "Select date...",
-    maxValue = today(getLocalTimeZone()),
+    placeholder = "DD/MM/YYYY",
+    maxValue,
     disabled = false,
     valueType = undefined,
-  } = $props();
+  }: Props = $props();
 
   let open = $state(false);
 

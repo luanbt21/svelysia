@@ -11,6 +11,8 @@
 	import { toast } from "svelte-sonner";
 	import type { EventHandler } from "svelte/elements";
 	import { goto } from "$app/navigation";
+	import { m } from "$lib/paraglide/messages.js";
+	import LanguageSwitcher from "$lib/components/language-switcher.svelte";
 
 	const callbackURL = page.url.searchParams.get("redirect") || "/trees";
 	let pending = $state(false);
@@ -28,7 +30,7 @@
 			const username = data.get("username") as string;
 
 			if (!email || !password || !name || !username) {
-				toast.error("All fields are required");
+				toast.error(m.fields_required_error());
 				return;
 			}
 
@@ -41,14 +43,14 @@
 			});
 
 			if (error) {
-				toast.error(error.message || "Failed to sign up");
+				toast.error(error.message || m.sign_up_failed());
 				return;
 			}
 
-			toast.success("Account created successfully!");
+			toast.success(m.sign_up_success());
 			goto("/login");
 		} catch (err) {
-			toast.error("Failed to sign up");
+			toast.error(m.sign_up_failed());
 			console.error(err);
 		} finally {
 			pending = false;
@@ -76,7 +78,7 @@
 </script>
 
 <section class="grid min-h-screen grid-rows-[auto_1fr] bg-background px-4">
-	<div class="mx-auto w-full max-w-7xl border-b py-3">
+	<div class="mx-auto w-full max-w-7xl border-b py-3 flex items-center justify-between">
 		<Button
 			href="/"
 			aria-label="go home"
@@ -86,19 +88,20 @@
 		>
 			<Logo class="w-fit" />
 		</Button>
+		<LanguageSwitcher />
 	</div>
 
 	<div class="m-auto w-full max-w-sm">
 		<div class="text-center">
-			<h1 class="font-serif text-4xl font-medium">Create an account</h1>
+			<h1 class="font-serif text-4xl font-medium">{m.create_account_title()}</h1>
 			<p class="mt-2 text-sm text-muted-foreground">
-				Get started with your free account today
+				{m.get_started_today()}
 			</p>
 		</div>
 		<Card class="mt-6 p-8">
 			<form action="" class="space-y-5" onsubmit={handleSubmit}>
 				<div class="space-y-3">
-					<Label for="name" class="text-sm">Full Name</Label>
+					<Label for="name" class="text-sm">{m.full_name()}</Label>
 					<Input
 						type="text"
 						id="name"
@@ -110,7 +113,7 @@
 				</div>
 
 				<div class="space-y-3">
-					<Label for="username" class="text-sm">Username</Label>
+					<Label for="username" class="text-sm">{m.username()}</Label>
 					<Input
 						type="text"
 						id="username"
@@ -122,7 +125,7 @@
 				</div>
 
 				<div class="space-y-3">
-					<Label for="email" class="text-sm">Email</Label>
+					<Label for="email" class="text-sm">{m.email()}</Label>
 					<Input
 						type="email"
 						id="email"
@@ -134,12 +137,12 @@
 				</div>
 
 				<div class="space-y-3">
-					<Label for="password" class="text-sm">Password</Label>
+					<Label for="password" class="text-sm">{m.password()}</Label>
 					<Input
 						type="password"
 						id="password"
 						name="password"
-						placeholder="Create a password"
+						placeholder={m.create_password_placeholder()}
 						required
 						disabled={pending}
 					/>
@@ -149,13 +152,13 @@
 					{#if pending}
 						<Spinner />
 					{/if}
-					Create Account
+					{m.create_account_btn()}
 				</Button>
 			</form>
 
 			<div class="my-6 flex items-center gap-3">
 				<hr class="flex-1" />
-				<span class="text-xs text-muted-foreground">or continue with</span>
+				<span class="text-xs text-muted-foreground">{m.or_continue_with()}</span>
 				<hr class="flex-1" />
 			</div>
 
@@ -170,10 +173,11 @@
 		</Card>
 
 		<p class="mt-6 text-center text-sm text-muted-foreground">
-			Already have an account?
+			{m.already_have_account()}
 			<Button href="/login" variant="link" class="px-1 font-medium text-primary"
-				>Sign in</Button
+				>{m.sign_in()}</Button
 			>
 		</p>
 	</div>
 </section>
+

@@ -1,5 +1,5 @@
 import { db } from "$lib/server/db";
-import type { PageServerLoad } from "./$types";
+import type { PageServerLoad } from "./trees/$types";
 
 export const load: PageServerLoad = async ({ parent }) => {
   const { user } = await parent();

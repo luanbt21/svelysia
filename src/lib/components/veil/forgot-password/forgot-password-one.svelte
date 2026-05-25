@@ -8,6 +8,8 @@
 	import { Spinner } from "$lib/components/ui/spinner";
 	import { toast } from "svelte-sonner";
 	import type { EventHandler } from "svelte/elements";
+	import { m } from "$lib/paraglide/messages.js";
+	import LanguageSwitcher from "$lib/components/language-switcher.svelte";
 
 	let pending = $state(false);
 
@@ -20,7 +22,7 @@
 			const data = new FormData(e.currentTarget);
 			const email = data.get("email");
 			if (!email) {
-				toast.error("Email is required");
+				toast.error(m.email_required_error());
 				return;
 			}
 
@@ -29,13 +31,13 @@
 			});
 
 			if (error) {
-				toast.error(error.message || "Failed to request password reset link");
+				toast.error(error.message || m.reset_failed());
 				return;
 			}
 
-			toast.success("Password reset link sent to your email!");
+			toast.success(m.reset_link_sent());
 		} catch (err) {
-			toast.error("Failed to request password reset");
+			toast.error(m.reset_failed());
 			console.error(err);
 		} finally {
 			pending = false;
@@ -44,7 +46,7 @@
 </script>
 
 <section class="grid min-h-screen grid-rows-[auto_1fr] bg-background px-4">
-	<div class="mx-auto w-full max-w-7xl border-b py-3">
+	<div class="mx-auto w-full max-w-7xl border-b py-3 flex items-center justify-between">
 		<Button
 			href="/"
 			aria-label="go home"
@@ -54,19 +56,20 @@
 		>
 			<Logo class="w-fit" />
 		</Button>
+		<LanguageSwitcher />
 	</div>
 
 	<div class="m-auto w-full max-w-sm">
 		<div class="text-center">
-			<h1 class="font-serif text-4xl font-medium">Forgot password?</h1>
+			<h1 class="font-serif text-4xl font-medium">{m.forgot_password()}</h1>
 			<p class="mt-2 text-sm text-muted-foreground">
-				Enter your email and we'll send you a reset link
+				{m.forgot_password_desc()}
 			</p>
 		</div>
 		<Card class="mt-6 p-8">
 			<form action="" class="space-y-5" onsubmit={handleSubmit}>
 				<div class="space-y-3">
-					<Label for="email" class="text-sm">Email</Label>
+					<Label for="email" class="text-sm">{m.email()}</Label>
 					<Input
 						type="email"
 						id="email"
@@ -81,16 +84,17 @@
 					{#if pending}
 						<Spinner />
 					{/if}
-					Send Reset Link
+					{m.send_reset_link()}
 				</Button>
 			</form>
 		</Card>
 
 		<p class="mt-6 text-center text-sm text-muted-foreground">
-			Remember your password?
+			{m.remember_password()}
 			<Button href="/login" variant="link" class="px-1 font-medium text-primary"
-				>Sign in</Button
+				>{m.sign_in()}</Button
 			>
 		</p>
 	</div>
 </section>
+

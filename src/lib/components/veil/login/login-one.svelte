@@ -10,6 +10,8 @@
 	import type { Component } from "svelte";
 	import { toast } from "svelte-sonner";
 	import type { EventHandler } from "svelte/elements";
+	import { m } from "$lib/paraglide/messages.js";
+	import LanguageSwitcher from "$lib/components/language-switcher.svelte";
 
 	const callbackURL = page.url.searchParams.get("redirect") || "/trees";
 	let pending = $state(false);
@@ -24,7 +26,7 @@
 			const email = data.get("email");
 			const password = data.get("password");
 			if (!email || !password) {
-				toast.error("All fields are required");
+				toast.error(m.fields_required_error());
 				return;
 			}
 
@@ -35,13 +37,13 @@
 			});
 
 			if (error) {
-				toast.error(error.message || "Failed to sign in");
+				toast.error(error.message || m.sign_in_failed());
 				return;
 			}
 
-			toast.success("Signed in successfully!");
+			toast.success(m.sign_in_success());
 		} catch (err) {
-			toast.error("Failed to sign in");
+			toast.error(m.sign_in_failed());
 			console.error(err);
 		} finally {
 			pending = false;
@@ -69,7 +71,7 @@
 </script>
 
 <section class="grid min-h-screen grid-rows-[auto_1fr] bg-background px-4">
-	<div class="mx-auto w-full max-w-7xl border-b py-3">
+	<div class="mx-auto w-full max-w-7xl border-b py-3 flex items-center justify-between">
 		<Button
 			href="/"
 			aria-label="go home"
@@ -79,19 +81,20 @@
 		>
 			<Logo class="w-fit" />
 		</Button>
+		<LanguageSwitcher />
 	</div>
 
 	<div class="m-auto w-full max-w-sm">
 		<div class="text-center">
-			<h1 class="font-serif text-4xl font-medium">Welcome back</h1>
+			<h1 class="font-serif text-4xl font-medium">{m.welcome_back()}</h1>
 			<p class="mt-2 text-sm text-muted-foreground">
-				Sign in to your account to continue
+				{m.sign_in_to_continue()}
 			</p>
 		</div>
 		<Card class="mt-6 p-8">
 			<form action="" class="space-y-5" onsubmit={handleSubmit}>
 				<div class="space-y-3">
-					<Label for="email" class="text-sm">Email</Label>
+					<Label for="email" class="text-sm">{m.email()}</Label>
 					<Input
 						type="email"
 						id="email"
@@ -104,20 +107,20 @@
 
 				<div class="space-y-3">
 					<div class="flex items-center justify-between">
-						<Label for="password" class="text-sm">Password</Label>
+						<Label for="password" class="text-sm">{m.password()}</Label>
 						<Button
 							href="/forgot-password"
 							variant="link"
 							class="h-auto p-0 text-xs text-muted-foreground hover:text-foreground"
 						>
-							Forgot password?
+							{m.forgot_password()}
 						</Button>
 					</div>
 					<Input
 						type="password"
 						id="password"
 						name="password"
-						placeholder="Enter your password"
+						placeholder={m.password()}
 						required
 						disabled={pending}
 					/>
@@ -127,13 +130,13 @@
 					{#if pending}
 						<Spinner />
 					{/if}
-					Sign In
+					{m.sign_in()}
 				</Button>
 			</form>
 
 			<div class="my-6 flex items-center gap-3">
 				<hr class="flex-1" />
-				<span class="text-xs text-muted-foreground">or continue with</span>
+				<span class="text-xs text-muted-foreground">{m.or_continue_with()}</span>
 				<hr class="flex-1" />
 			</div>
 
@@ -148,10 +151,11 @@
 		</Card>
 
 		<p class="mt-6 text-center text-sm text-muted-foreground">
-			Don't have an account?
+			{m.dont_have_account()}
 			<Button href="/register" variant="link" class="px-1 font-medium text-primary"
-				>Sign up</Button
+				>{m.sign_up()}</Button
 			>
 		</p>
 	</div>
 </section>
+
